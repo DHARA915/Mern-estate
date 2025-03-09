@@ -28,7 +28,7 @@ export const signin = async (req,res,next)=>{
         return next(errorHandler(404,'User Not Found!'))
       }
       const validPassword = bcryptjs.compareSync(password,validUser.password)
-      if(!validPassword) return next(errorHandler(401,'Wrong credential!'))
+      if(!validPassword) return next(errorHandler(401,'Wrong credentials!'))
         const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
 
       // Remove password from user object before sending response

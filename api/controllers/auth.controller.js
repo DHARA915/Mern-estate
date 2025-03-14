@@ -35,9 +35,10 @@ export const signin = async (req,res,next)=>{
       const { password: pass, ...userData } = validUser._doc;
       
       // Set token in cookie
-      res.cookie('Access_token', token, { httpOnly: true });
-      
-      // Send response with user data
+      res.cookie('access_token', token, { httpOnly: true, secure: false, sameSite: 'strict' });
+  
+    
+    console.log("✅ Token Set in Cookies:", token);//its working...
       res.status(200).json(userData);
       
   }catch{
@@ -51,7 +52,7 @@ export const google = async (req,res,next)=>{
   if(user){
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
     const { password: pass, ...rest } = user._doc;
-    res.cookie('Access_token', token, { httpOnly: true });
+    res.cookie('access_token', token, { httpOnly: true });
     res.status(200).json(rest);
 
   }else{
@@ -66,7 +67,7 @@ export const google = async (req,res,next)=>{
       await newUser.save();
       const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
       const { password: pass, ...rest } = newUser._doc;
-      res.cookie('Access_token', token, { httpOnly: true });
+      res.cookie('access_token', token, { httpOnly: true });
       res.status(200).json(rest);
       
   }
@@ -74,3 +75,17 @@ export const google = async (req,res,next)=>{
     next(error)
   }
 }
+
+export const updateAvatar = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return next(errorHandler(404, 'User Not Found!'));
+    }
+    user.avatar = req.body.avatar;
+    await user.save();
+    res.status(200).json({ message: 'Avatar updated successfully!', avatar: user.avatar });
+  } catch (error) {
+    next(error);
+  }
+};

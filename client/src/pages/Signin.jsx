@@ -10,7 +10,7 @@ const Signin = () => {
   // const [error, setError] = useState(null)
   // const [loading, setLoading] = useState(false)
   const {loading,error} = useSelector((state)=>state.user)
-  const navigte = useNavigate();
+  const navigate = useNavigate();
   const dispatch=useDispatch()
   const handleOnchange = (e) => {
     setformData({
@@ -24,7 +24,7 @@ const Signin = () => {
   const handleOnsubmit = async (e) => {
     e.preventDefault();
     try{
-      dispatch(signInStart)
+      dispatch(signInStart())
       const res = await fetch('/api/auth/signin',
         {
           method: 'POST',
@@ -32,6 +32,7 @@ const Signin = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(formData),
+          credentials: "include", 
         }
       );
       const data = await res.json();
@@ -40,7 +41,7 @@ const Signin = () => {
         return
       }
       dispatch(signInSuccess(data))
-      navigte('/')
+      navigate('/')
     }catch(error){
  dispatch(signInFailure(error.message))
   setError(error.message)

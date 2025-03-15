@@ -1,5 +1,6 @@
 import User from "../models/user.model.js"
 import { errorHandler } from "../utils/error.js"
+import mongoose from "mongoose";
 import bcrypt from "bcryptjs" 
 
 export const test = (req, res) => {
@@ -7,35 +8,69 @@ export const test = (req, res) => {
 
 }
 
-
 export const updateProfile = async (req, res) => {
-  console.log("🔹 Received Token User:", req.user);
-  console.log("🔹 Request Body Email:", req.body.email);
-
-  if (!req.body.email) {
-    return res.status(400).json({ message: "Email is required" });
-  }
-
-  if (req.user.email !== req.body.email) {
-    return res.status(403).json({ message: "You can only update your own account" });
-  }
-
   try {
-    const user = await User.findById(req.user._id);
+    const { email, username, password } = req.body;
+    const userId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
+
+    const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ error: "User not found" });
     }
 
-    user.username = req.body.username || user.username;
-    if (req.body.password) {
-      user.password = bcrypt.hashSync(req.body.password, 10);
+    // ✅ Ensure email remains unchanged
+    if (email !== user.email) {
+      return res.status(403).json({ error: "Unauthorized: Email does not match." });
     }
 
-    await user.save();
-    res.status(200).json({ message: "Profile updated successfully", user: { username: user.username, email: user.email } });
+    let updateFields = {};
+    if (username) {
+      updateFields.username = username;
+    }
+
+    if (password && password.trim() !== "") {
+      const salt = await bcrypt.genSalt(10);
+      updateFields.password = await bcrypt.hash(password, salt);
+    }
+
+    if (Object.keys(updateFields).length === 0) {
+      return res.status(400).json({ error: "No changes detected to update." });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateFields, { new: true });
+
+    res.status(200).json({ message: "Profile updated successfully!", user: updatedUser });
   } catch (error) {
-    console.error("❌ Update Error:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error("Error updating profile:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
+export const  deleteUser=async(req,res,next)=>{
+  try{
+    const userId=req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      // return res.status(400).json({ error: "You can only delete you account" });
+      return next(errorHandler(401,"You can only delete your account"))
+    }
+    const user = await User.findById(userId)
+    if(!user){
+      // return res.status(404).json({error:"User not found"})
+      return next(errorHandler(404,"User Not Found"))
+      
+
+    }
+    await User.findByIdAndDelete(userId)
+    // res.status(200).json({message:"Account deleted sucessfully!"})
+    return next(errorHandler(200,"Account deleted sucessfully!"))
+  }
+  
+  catch(error){
+   console.error("Error in deleting account:",error)
+   res.status(500).json({ error: "Internal Server Error" });
+  }
+}

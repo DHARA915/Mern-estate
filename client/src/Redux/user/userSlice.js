@@ -24,8 +24,20 @@ const userSlice = createSlice({
     updateUserSuccess: (state, action) => {
       state.currentUser = { ...state.currentUser, ...action.payload }; // ✅ Merge updated fields
     },
+    deleteUserStart:(state)=>{
+      state.loading=true;
+    },
+    deleteUserSuccess:(state)=>{
+      state.currentUser=null
+      state.loading=false;
+      state.error=null
+    },
+    deleteUserFailure:(state,action)=>{
+      state.error=action.payload;
+      state.loading=false
+    }
   },
 });
 
-export const { signInStart, signInFailure, signInSuccess, updateUserSuccess } = userSlice.actions;
+export const { signInStart, signInFailure, signInSuccess, updateUserSuccess,deleteUserStart,deleteUserSuccess,deleteUserFailure} = userSlice.actions;
 export default userSlice.reducer;

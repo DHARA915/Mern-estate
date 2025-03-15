@@ -84,7 +84,7 @@ const signIn = async (email, password) => {
 };
 
 // // Example usage
-signIn("student@gmail.com", "student915");
+signIn("student@gmail.com", "student");
 
 
 

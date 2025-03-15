@@ -2,18 +2,23 @@ import React, { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { updateUserSuccess } from '../Redux/user/userSlice.js';
+import { updateUserSuccess,deleteUserStart,deleteUserSuccess,deleteUserFailure } from '../Redux/user/userSlice.js';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
   const fileRef = useRef(null);
   const dispatch = useDispatch();
+   const nevigate = useNavigate()
+  
   const { currentUser } = useSelector((state) => state.user) || {};
+
   const [imageUrl, setImageUrl] = useState(currentUser?.avatar || "default-avatar-url");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const [newUsername, setNewUsername] = useState(currentUser?.username || "");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   
   const handleFileUpload = async (event) => {
@@ -41,7 +46,7 @@ const Profile = () => {
       );
 
       setImageUrl(res.data.secure_url);
-      dispatch(updateUserSuccess({ avatar: res.data.secure_url })); // ✅ Update Redux state
+      dispatch(updateUserSuccess({ avatar: res.data.secure_url }));
     } catch (error) {
       setMessageType("error");
       setMessage("Image upload failed. Please try again.");
@@ -79,24 +84,30 @@ const Profile = () => {
       return;
     }
   
-    const newEmail = document.getElementById("email").value;
-    const userData = {
-      username: newUsername,
-      email: newEmail,
-      password: document.getElementById("password").value,
-      avatar: imageUrl,
-    };
+    if (!newUsername.trim()) {
+      setMessageType("error");
+      setMessage("Username cannot be empty.");
+      return;
+    }
   
+    const newEmail = document.getElementById("email").value;
     if (newEmail !== currentUser.email) {
       setMessageType("error");
       setMessage("You cannot change your email to another account.");
       return;
     }
   
+    const userData = {
+      username: newUsername,
+      email: newEmail,
+      password: password,
+      avatar: imageUrl,
+    };
+  
     const response = await updateProfile(userData);
   
     if (response.success !== false) {
-      dispatch(updateUserSuccess(userData)); // ✅ Update Redux state globally
+      dispatch(updateUserSuccess(userData));
       setMessageType("success");
       setMessage("Profile updated successfully! ✅");
     } else {
@@ -104,6 +115,30 @@ const Profile = () => {
       setMessage(response.message || "Profile update failed.");
     }
   };
+
+  const handleDeleteAccount = async () => {
+    const confirmDelete = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
+    if (!confirmDelete) return;
+  
+    try {
+      dispatch(deleteUserStart());  // Dispatch the start action
+  
+      const response = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",  // Use the DELETE method
+      });
+  
+      if (response.ok) {  
+        dispatch(deleteUserSuccess());  
+       nevigate("/sign-up");  
+      } else {
+        const errorData = await response.json();  // Parse the error message from the response
+        throw new Error(errorData.message || "Failed to delete account");
+      }
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message || "Failed to delete account"));  // Dispatch failure action with error message
+    }
+  };
+  
   
   return (
     <div className='p-3 max-w-lg mx-auto'>
@@ -118,8 +153,8 @@ const Profile = () => {
         <div className='flex flex-col items-center'>
           <img 
             onClick={() => fileRef.current.click()} 
-            src={imageUrl} 
-            alt="profile" 
+            src={imageUrl||"https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o="} 
+           
             className='rounded-full mt-2 h-24 w-24 object-cover cursor-pointer' 
           />
           {isUploading && (
@@ -143,6 +178,8 @@ const Profile = () => {
             type={showPassword ? "text" : "password"}
             placeholder="Password"
             className="border bg-white p-3 rounded-lg w-full pr-10"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
           <button
             type="button"
@@ -152,10 +189,10 @@ const Profile = () => {
             {showPassword ?<FaEye />: <FaEyeSlash />}
           </button>
         </div>
-        <button className='bg-slate-700 p-3 rounded-lg text-white uppercase hover:opacity-95 disabled:opacity-80'>Update</button>
+        <button disabled={isUploading} className='bg-slate-700 p-3 rounded-lg text-white uppercase hover:opacity-95 disabled:opacity-80'>Update</button>
       </form>
       <div className='flex justify-between mt-5'>
-        <span className='text-red-700 cursor-pointer'>Delete Account</span>
+        <span onClick={handleDeleteAccount} className='text-red-700 cursor-pointer'>Delete Account</span>
         <span className='text-red-700 cursor-pointer'>Sign out</span>
       </div>
     </div>

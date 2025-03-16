@@ -41,7 +41,7 @@ export const signin = async (req,res,next)=>{
     console.log("✅ Token Set in Cookies:", token);//its working...
       res.status(200).json(userData);
       
-  }catch{
+  }catch(error){
     next(error)
   }
 }

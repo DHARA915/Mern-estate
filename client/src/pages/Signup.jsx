@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 import { Link,useNavigate } from 'react-router-dom'
 import OAuth from '../Components/OAuth'
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Signup = () => {
   const [formData, setformData] = useState({})
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
   const navigte = useNavigate();
   const handleOnchange = (e) => {
     setformData({
@@ -53,7 +55,23 @@ const Signup = () => {
       <form onSubmit={handleOnsubmit} action="" className='flex flex-col gap-4'>
         <input type='text' placeholder='username' className='border bg-slate-100 p-3 rounded-lg' id='username' onChange={handleOnchange} />
         <input type='text' placeholder='email' className='border bg-slate-100 p-3 rounded-lg' id='email' onChange={handleOnchange} />
-        <input type='text' placeholder='password' className='border bg-slate-100 p-3 rounded-lg' id='password' onChange={handleOnchange} />
+        {/* <input type='text' placeholder='password' className='border bg-slate-100 p-3 rounded-lg' id='password' onChange={handleOnchange} /> */}
+        <div className="relative w-full">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            className="border bg-slate-100 p-3 rounded-lg w-full pr-10"
+            id="password"
+            onChange={handleOnchange}
+          />
+          <button
+            type="button"
+            className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+          </button>
+        </div>
         <button disabled={loading} className='bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80'>
           {
             loading?'Loading...' : 'Sign Up'

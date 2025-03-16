@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { updateUserSuccess,deleteUserStart,deleteUserSuccess,deleteUserFailure } from '../Redux/user/userSlice.js';
+import { updateUserSuccess,deleteUserStart,deleteUserSuccess,deleteUserFailure, signoutUserStart, signoutUserFailure, signInFailure, signoutUserSuccess } from '../Redux/user/userSlice.js';
 import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
@@ -138,6 +138,21 @@ const Profile = () => {
       dispatch(deleteUserFailure(error.message || "Failed to delete account"));  // Dispatch failure action with error message
     }
   };
+
+  const handleSignOut = async ()=>{
+    try{
+      dispatch(signoutUserStart())
+const res = await fetch('/api/auth/signout')
+const data= await res.json();
+if(data.success===false){
+  dispatch(signoutUserFailure(data.message))
+  return
+}
+dispatch(signoutUserSuccess(data))
+    }catch(error){
+    dispatch(signoutUserFailure(data.message))
+    }
+  }
   
   
   return (
@@ -193,7 +208,7 @@ const Profile = () => {
       </form>
       <div className='flex justify-between mt-5'>
         <span onClick={handleDeleteAccount} className='text-red-700 cursor-pointer'>Delete Account</span>
-        <span className='text-red-700 cursor-pointer'>Sign out</span>
+        <span onClick={handleSignOut} className='text-red-700 cursor-pointer'>Sign out</span>
       </div>
     </div>
   );

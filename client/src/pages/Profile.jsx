@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { updateUserSuccess,deleteUserStart,deleteUserSuccess,deleteUserFailure, signoutUserStart, signoutUserFailure, signInFailure, signoutUserSuccess } from '../Redux/user/userSlice.js';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,Link} from 'react-router-dom';
 
 const Profile = () => {
   const fileRef = useRef(null);
@@ -205,6 +205,8 @@ dispatch(signoutUserSuccess(data))
           </button>
         </div>
         <button disabled={isUploading} className='bg-slate-700 p-3 rounded-lg text-white uppercase hover:opacity-95 disabled:opacity-80'>Update</button>
+     <Link to={"/create-listing"} className='bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacity-95'> Create listing
+      </Link>
       </form>
       <div className='flex justify-between mt-5'>
         <span onClick={handleDeleteAccount} className='text-red-700 cursor-pointer'>Delete Account</span>

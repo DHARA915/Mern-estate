@@ -3,9 +3,11 @@ import { useState } from 'react';
 
 const CreateListing = () => {
   const [fileName, setFileName] = useState("No file chosen");
+ 
 
   const handleFileChange = (event) => {
     const files = event.target.files;
+    console.log(files)
     if (files.length > 0) {
       setFileName(files.length === 1 ? files[0].name : `${files.length} files selected`);
     } else {

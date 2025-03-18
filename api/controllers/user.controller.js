@@ -11,7 +11,7 @@ export const test = (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { email, username, password } = req.body;
+    const { email, username, password, avatar } = req.body;
     const userId = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -23,20 +23,17 @@ export const updateProfile = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // ✅ Ensure email remains unchanged
     if (email !== user.email) {
       return res.status(403).json({ error: "Unauthorized: Email does not match." });
     }
 
     let updateFields = {};
-    if (username) {
-      updateFields.username = username;
-    }
-
-    if (password && password.trim() !== "") {
+    if (username) updateFields.username = username;
+    if (password && password.trim()) {
       const salt = await bcrypt.genSalt(10);
       updateFields.password = await bcrypt.hash(password, salt);
     }
+    if (avatar) updateFields.avatar = avatar;  // ✅ Add avatar field
 
     if (Object.keys(updateFields).length === 0) {
       return res.status(400).json({ error: "No changes detected to update." });

@@ -22,6 +22,7 @@ const Profile = () => {
   const [showPassword, setShowPassword] = useState(false);
   
   const handleFileUpload = async (event) => {
+    setMessage("")
     const file = event.target.files[0];
     if (!file) return;
 
@@ -46,7 +47,7 @@ const Profile = () => {
       );
 
       setImageUrl(res.data.secure_url);
-      dispatch(updateUserSuccess({ avatar: res.data.secure_url }));
+     
     } catch (error) {
       setMessageType("error");
       setMessage("Image upload failed. Please try again.");
@@ -101,13 +102,13 @@ const Profile = () => {
       username: newUsername,
       email: newEmail,
       password: password,
-      avatar: imageUrl,
+      avatar: imageUrl,  // ✅ Include avatar
     };
   
     const response = await updateProfile(userData);
   
     if (response.success !== false) {
-      dispatch(updateUserSuccess(userData));
+      dispatch(updateUserSuccess(response.user));  // ✅ Store updated user
       setMessageType("success");
       setMessage("Profile updated successfully! ✅");
     } else {
@@ -115,6 +116,7 @@ const Profile = () => {
       setMessage(response.message || "Profile update failed.");
     }
   };
+  
 
   const handleDeleteAccount = async () => {
     const confirmDelete = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
@@ -149,6 +151,7 @@ if(data.success===false){
   return
 }
 dispatch(signoutUserSuccess(data))
+localStorage.clear(); 
     }catch(error){
     dispatch(signoutUserFailure(data.message))
     }

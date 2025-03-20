@@ -121,7 +121,9 @@ const ShowListing = () => {
                 <div className="flex justify-between mt-10">
                   <p className="text-green-600 font-bold mt-2">₹{listing.type}</p>
                   <div className="flex gap-3">
+                   <Link to={`/update-listing/${listing._id}`}>
                     <button className="bg-green-100 p-2 rounded-xl w-20 text-green-600 font-semibold">Edit</button>
+                    </Link>
                     <button
                       onClick={() => handleDeleteClick(listing._id)}
                       className="bg-red-100 p-2 rounded-xl w-20 text-red-600 font-semibold"

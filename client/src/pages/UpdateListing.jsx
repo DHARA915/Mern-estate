@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useSelector } from 'react-redux'
-import {useNavigate} from 'react-router-dom'
+import {useNavigate,useParams} from 'react-router-dom'
+import { useEffect } from "react";
 
-const CreateListing = () => {
+const UpdateListing = () => {
   const { currentUser } = useSelector(state => state.user)
+
+  
 
   const [fileName, setFileName] = useState("No file chosen");
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -18,6 +21,7 @@ const CreateListing = () => {
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(false)
   const navigate=useNavigate()
+  const params=useParams()
 
   const [formData, setFormData] = useState({
     imageUrls: [],
@@ -34,7 +38,25 @@ const CreateListing = () => {
     furnished: false
 
   })
-  console.log(formData)
+  // console.log(formData)
+
+  useEffect(()=>{
+  const fetchListing=async()=>{
+  const listingId=params.listingId;
+  console.log(listingId)
+
+  const res = await fetch(`/api/listing/get/${listingId}`)
+  const data=await res.json();
+  if(data.success===false){
+    console.log(data.message);
+      return;
+    
+  }
+  setFormData(data)
+  setUploadedUrls(data.imageUrls);
+  }
+  fetchListing();
+  },[]);
 
 
 
@@ -59,16 +81,15 @@ const CreateListing = () => {
       setErrorMessage("Please select images to upload.");
       return;
     }
-    setErrorMessage(""); // Clear the error message if images are selected
+    setErrorMessage("");
     setUploading(true);
     setUploadProgress({});
-    setUploadedUrls([]);
-
+  
     const uploadPromises = selectedFiles.map((file) => {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", import.meta.env.VITE_REACT_APP_CLOUDINARY_UPLOAD_PRESET);
-
+  
       return axios
         .post(
           `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
@@ -90,25 +111,30 @@ const CreateListing = () => {
           return null;
         });
     });
-
+  
     const urls = await Promise.all(uploadPromises);
     const validUrls = urls.filter((url) => url !== null);
-    console.log(validUrls);
-
-    setUploadedUrls(validUrls);
-    setUploading(false);
+  
+    // Append new URLs to existing ones
+    setUploadedUrls((prevUrls) => [...prevUrls, ...validUrls]);
     setFormData((prevData) => ({
       ...prevData,
-      imageUrls: validUrls, // Add uploaded URLs to formData
+      imageUrls: [...prevData.imageUrls, ...validUrls], // Append new URLs to formData.imageUrls
     }));
+  
+    setUploading(false);
   };
-  const handleDelete = (index) => {
-    setUploadedUrls((prevUrls) => {
-      const updatedUrls = prevUrls.filter((_, i) => i !== index);
-      console.log("Remaining URLs:", updatedUrls); // Log remaining images
-      return updatedUrls;
-    });
-  };
+
+ const handleDelete = (index) => {
+  setUploadedUrls((prevUrls) => {
+    const updatedUrls = prevUrls.filter((_, i) => i !== index);
+    setFormData((prevData) => ({
+      ...prevData,
+      imageUrls: updatedUrls, // Update formData.imageUrls as well
+    }));
+    return updatedUrls;
+  });
+};
 
   const handleChange = (e) => {
     if (e.target.id === 'sale' || e.target.id === 'rent') {
@@ -153,7 +179,7 @@ const CreateListing = () => {
       setError(false);
       setSubmitted(false);
   
-      const res = await fetch('/api/listing/create', {
+      const res = await fetch(`/api/listing/update/${params.listingId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -188,7 +214,7 @@ const CreateListing = () => {
         className={`p-2 max-w-6xl mx-auto transition-opacity duration-300 ${showPopup ? "opacity-50 pointer-events-none" : "opacity-100"
           }`}
       >
-        <h1 className="text-3xl font-semibold text-center my-7">Create a Listing</h1>
+        <h1 className="text-3xl font-semibold text-center my-7">Edit Listing</h1>
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-6">
           <div className="flex flex-col gap-4 flex-1">
             <input
@@ -307,19 +333,19 @@ const CreateListing = () => {
 
 
             {/* Display uploaded images */}
-            <div className="flex flex-col gap-2 ">
-              {uploadedUrls.map((url, index) => (
-                <div key={index} className="border-2 border-gray-300 p-1  w-full flex justify-between items-center">
-                  <img src={url} alt={`Uploaded ${index}`} className="w-full max-w-[160px] h-auto object-contain" />
-                  <button
-                    onClick={() => handleDelete(index)}
-                    className=" text-red-700 uppercase px-3 py-1 text-sm"
-                  >
-                    Delete
-                  </button>
-                </div>
-              ))}
-            </div>
+            <div className="flex flex-col gap-2">
+  {uploadedUrls.map((url, index) => (
+    <div key={index} className="border-2 border-gray-300 p-1 w-full flex justify-between items-center">
+      <img src={url} alt={`Uploaded ${index}`} className="w-40 h-20 object-contain" />
+      <button  type="button" 
+        onClick={() => handleDelete(index)}
+        className="text-red-700 uppercase px-3 py-1 text-sm"
+      >
+        Delete
+      </button>
+    </div>
+  ))}
+</div>
 
 
             <div>{errorMessage && <p className="font-semibold text-red-600 text-sm">{errorMessage}</p>}
@@ -331,7 +357,7 @@ const CreateListing = () => {
   onClick={handleSubmit} 
   className="p-3 bg-slate-700 text-white w-full rounded-lg hover:opacity-95 disabled:opacity-80"
 >
-  {loading ? 'Creating...' : 'Create Listing'}
+  {loading ? 'Editing...' : 'Edit Listing'}
 </button>
 
 {/* Ensure error message always appears if there's an error */}
@@ -361,4 +387,4 @@ const CreateListing = () => {
   );
 };
 
-export default CreateListing;
+export default UpdateListing;

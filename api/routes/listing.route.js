@@ -6,4 +6,5 @@ const router = express.Router()
 
 router.post('/create',protect,createlisting)
 
+
 export default router;

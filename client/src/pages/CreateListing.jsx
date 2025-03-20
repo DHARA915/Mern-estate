@@ -255,13 +255,18 @@ const CreateListing = () => {
                 max='100000000'
                 onChange={handleChange}
                 value={formData.regularPrice}
-              /><span>Regular Price ($/month)</span></div>
+              /> <span>
+              {formData.type === 'rent' ? 'Regular Price ($/month)' : 'Regular Price ($)'}
+            </span>
+              </div>
 
               {formData.offer &&(
                  <div className='flex items-center gap-2'><input type="number" id='discountPrice' className='border p-3 rounded-lg' required
                  onChange={handleChange}
                  value={formData.discountPrice}
-               /><span>Discount Price ($/month)</span></div>
+               /> <span>
+               {formData.type === 'rent' ? 'Discount Price ($/month)' : ' Discount Price ($)'}
+             </span></div>
               )}
               
 

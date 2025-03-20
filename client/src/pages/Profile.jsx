@@ -20,6 +20,7 @@ const Profile = () => {
   const [newUsername, setNewUsername] = useState(currentUser?.username || "");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showListingError,setShowListingError]= useState(false)
   
   const handleFileUpload = async (event) => {
     setMessage("")
@@ -157,6 +158,19 @@ localStorage.clear();
     }
   }
   
+  // const handleShowListing = async ()=>{
+  //   try{
+  //     setShowListingError(false)
+  //     const res= await fetch (`/api/user/listing/${currentUser._id}`);
+  //     const data = await res.json();
+  //     if(data.success===false){
+  //       setShowListingError(true)
+  //       return;
+  //     }
+  //   }catch(error){
+  //    showListingError(true);
+  //   }
+  // }
   
   return (
     <div className='p-3 max-w-lg mx-auto'>
@@ -210,11 +224,21 @@ localStorage.clear();
         <button disabled={isUploading} className='bg-slate-700 p-3 rounded-lg text-white uppercase hover:opacity-95 disabled:opacity-80'>Update</button>
      <Link to={"/create-listing"} className='bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacity-95'> Create listing
       </Link>
+      
       </form>
       <div className='flex justify-between mt-5'>
         <span onClick={handleDeleteAccount} className='text-red-700 cursor-pointer'>Delete Account</span>
         <span onClick={handleSignOut} className='text-red-700 cursor-pointer'>Sign out</span>
       </div>
+      <Link to={'/Show-Listing'}>
+      <button className='text-green-800 w-full cursor-pointer' >Show listing</button>
+      </Link>
+     
+      <p className='text-semibold text-red-700 w-full'>
+        {
+          showListingError ? 'Error showing listing':''
+        }
+      </p>
     </div>
   );
 };

@@ -114,7 +114,7 @@ const ShowListing = () => {
                   />
                 </Link>
 
-                <h2 className="text-xl text-red-600 font-semibold mt-4">{listing.name}</h2>
+                <h2 className="text-xl text-slate-800 font-semibold mt-4">{listing.name}</h2>
                 <h2 className="text-xl font-semibold mt-2">{listing.title}</h2>
                 <p className="text-gray-600">{listing.description}</p>
 

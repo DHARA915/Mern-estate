@@ -10,6 +10,7 @@ import PrivateRoute from './Components/privateRoute'
 import CreateListing from './pages/CreateListing'
 import Showlisting from './pages/Showlisting'
 import UpdateListing from './pages/UpdateListing'
+import Listingpage from './pages/Listingpage'
 
 
 const App = () => {
@@ -20,6 +21,7 @@ const App = () => {
       <Route path="/sign-in" element={<Signin />} />
       <Route path="/sign-up" element={<Signup />} />
       <Route path="/about" element={<About />} />
+      <Route path="/listing/:listingId" element={<Listingpage/>} />
       <Route element={<PrivateRoute />}>
 
         <Route path="/profile" element={<Profile />} />
@@ -27,6 +29,7 @@ const App = () => {
         <Route path="/Show-Listing" element={<Showlisting/>}/>
         <Route path="/update-listing/:listingId" element={<UpdateListing/>}/>
       </Route>
+      
     </Routes>
 
   </BrowserRouter>

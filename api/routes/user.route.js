@@ -5,13 +5,14 @@ import { protect } from '../middleware/authMiddleware.js';
 import User from '../models/user.model.js';
 import { updateProfile } from '../controllers/user.controller.js';
 import { deleteUser } from '../controllers/user.controller.js';
-import{getUserListing} from '../controllers/user.controller.js'
+import{getUserListing,getUser} from '../controllers/user.controller.js'
 
 const router = express.Router();
 
 router.put("/update/:id", protect,updateProfile);
 router.delete('/delete/:id',protect,deleteUser);
-router.get('/listing/:id',protect,getUserListing)
+router.get('/listing/:id',protect,getUserListing);
+router.get('/:id',protect,getUser)
 
 
 

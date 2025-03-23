@@ -11,6 +11,7 @@ import CreateListing from './pages/CreateListing'
 import Showlisting from './pages/Showlisting'
 import UpdateListing from './pages/UpdateListing'
 import Listingpage from './pages/Listingpage'
+import Search from './pages/Search'
 
 
 const App = () => {
@@ -21,6 +22,7 @@ const App = () => {
       <Route path="/sign-in" element={<Signin />} />
       <Route path="/sign-up" element={<Signup />} />
       <Route path="/about" element={<About />} />
+      <Route path="/search" element={<Search />} />
       <Route path="/listing/:listingId" element={<Listingpage/>} />
       <Route element={<PrivateRoute />}>
 

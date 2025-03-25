@@ -16,7 +16,7 @@ import Search from './pages/Search'
 
 const App = () => {
   return <BrowserRouter>
-    <Header />
+    <Header/>
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/sign-in" element={<Signin />} />

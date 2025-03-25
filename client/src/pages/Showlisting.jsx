@@ -95,7 +95,7 @@ const ShowListing = () => {
 
       {/* Page Content */}
       <div className={`p-10 transition ${showModal ? 'opacity-100' : 'opacity-100'}`}>
-        <h1 className="text-3xl font-bold text-center mb-10">Your Listings</h1>
+        <h1 className="text-slate-700 text-3xl font-bold text-center mb-10">Your Listings</h1>
 
         {listings.length === 0 ? (
           <p className="text-center text-gray-600">No listings found.</p>

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ListingItem from '../Components/ListingItem';
 
 const Search = () => {
@@ -13,10 +13,10 @@ const Search = () => {
         order: 'desc',
     });
 
-    const navigate = useNavigate()
-    const [loading,setLoading]=useState(false)
-    const [listing,setListing]=useState([]);
-    console.log(listing)
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [listing, setListing] = useState([]);
+    const [showmore, setShowmore] = useState(false);
 
     useEffect(() => {
         const urlParams = new URLSearchParams(location.search);
@@ -28,29 +28,20 @@ const Search = () => {
         const sortFromUrl = urlParams.get('sort');
         const orderFromUrl = urlParams.get('order');
 
-        if (
-            searchTermFromUrl ||
-            typeFromUrl ||
-            parkingFromUrl ||
-            furnishedFromUrl ||
-            offerFromUrl ||
-            sortFromUrl ||
-            orderFromUrl
-        ) {
-            setSiderbardata({
-                searchTerm: searchTermFromUrl || '',
-                type: typeFromUrl || 'all',
-                parking: parkingFromUrl === 'true' ? true : false,
-                furnished: furnishedFromUrl === 'true' ? true : false,
-                offer: offerFromUrl === 'true' ? true : false,
-                sort: sortFromUrl || 'createdAt',
-                order: orderFromUrl || 'desc',
-            });
-        }
+        setSiderbardata({
+            searchTerm: searchTermFromUrl || '',
+            type: typeFromUrl || 'all',
+            parking: parkingFromUrl === 'true',
+            furnished: furnishedFromUrl === 'true',
+            offer: offerFromUrl === 'true',
+            sort: sortFromUrl || 'createdAt',
+            order: orderFromUrl || 'desc',
+        });
 
         const fetchListings = async () => {
             try {
                 setLoading(true);
+                setShowmore(false)
                 const searchQuery = urlParams.toString();
                 const res = await fetch(`/api/listing/get?${searchQuery}`);
                 
@@ -59,6 +50,7 @@ const Search = () => {
                 }
 
                 const data = await res.json();
+                setShowmore(data.length > 8);
                 setListing(data);
             } catch (error) {
                 console.error('Error fetching listings:', error);
@@ -66,45 +58,62 @@ const Search = () => {
                 setLoading(false);
             }
         };
-      fetchListings()
-
-    },[location.search])
+        fetchListings();
+    }, [location.search]);
 
     const handleChange = (e) => {
-        if (e.target.id === 'all' || e.target.id === 'rent' || e.target.id === 'sale') {
-            setSiderbardata({ ...sidebardata, type: e.target.id })
+        const { id, value, type, checked } = e.target;
+        
+        if (id === 'all' || id === 'rent' || id === 'sale') {
+            setSiderbardata({ ...sidebardata, type: id });
+        } 
+        else if (id === 'searchTerm') {
+            setSiderbardata({ ...sidebardata, searchTerm: value });
+        } 
+        else if (id === 'parking' || id === 'furnished' || id === 'offer') {
+            setSiderbardata({ ...sidebardata, [id]: checked });
+        } 
+        else if (id === 'sort_order') {
+            const [sort, order] = value.split("_");
+            setSiderbardata({ ...sidebardata, sort, order });
         }
-        if (e.target.id === 'searchTerm') {
-            setSiderbardata({ ...sidebardata, searchTerm: e.target.value })
-        }
-        if (e.target.id === 'parking' || e.target.id === 'furnished' || e.target.id === 'offer') {
-            setSiderbardata({ ...sidebardata, [e.target.id]: e.target.checked || e.target.checked === 'true' ? true : false })
-        }
-        if (e.target.id === 'sort_order') {
-            const sort = e.target.value.split("_")[0] || 'createdAt';
-            const order = e.target.value.split("_")[1] || 'desc';
-            setSiderbardata({ ...sidebardata, sort, order })
-        }
-    }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         const urlParams = new URLSearchParams();
-        urlParams.set('searchTerm', sidebardata.searchTerm)
-        urlParams.set('type', sidebardata.type)
-        urlParams.set('parking', sidebardata.parking)
-        urlParams.set('furnished', sidebardata.furnished)
-        urlParams.set('sort', sidebardata.sort)
-        urlParams.set('order', sidebardata.order)
-        const searchQuery = urlParams.toString()
-        navigate(`/search?${searchQuery}`)
-    }
+        urlParams.set('searchTerm', sidebardata.searchTerm);
+        urlParams.set('type', sidebardata.type);
+        urlParams.set('parking', sidebardata.parking);
+        urlParams.set('furnished', sidebardata.furnished);
+        urlParams.set('offer', sidebardata.offer);
+        urlParams.set('sort', sidebardata.sort);
+        urlParams.set('order', sidebardata.order);
+        
+        navigate(`/search?${urlParams.toString()}`);
+    };
+
+    const onShowMoreClick = async () => {
+        try {
+            const startIndex = listing.length;
+            const urlParams = new URLSearchParams(location.search);
+            urlParams.set('startIndex', startIndex);
+            
+            const res = await fetch(`/api/listing/get?${urlParams.toString()}`);
+            const data = await res.json();
+            
+            setShowmore(data.length >= 9);
+            setListing([...listing, ...data]);
+        } catch (error) {
+            console.error('Error loading more listings:', error);
+        }
+    };
 
     return (
         <div className='flex flex-col md:flex-row'>
             {/* leftside */}
             <div className='p-7 md:border-r-2 border-slate-200 md:h-screen md:sticky md:top-0 md:overflow-y-auto'>
-                <form onSubmit={handleSubmit} action="" className='flex flex-col gap-8'>
+                <form onSubmit={handleSubmit} className='flex flex-col gap-8'>
                     <div className='flex items-center gap-2 '>
                         <label className=' whitespace-nowrap font-semibold text-slate-700'>Search Term:</label>
                         <input type="text" id='searchTerm' placeholder='Search...'
@@ -161,14 +170,16 @@ const Search = () => {
                                 type="checkbox" id="furnished" className='w-5' />
                             <span>Furnished</span>
                         </div>
-
                     </div>
                     <div className='gap-2 flex items-center'>
                         <label className='font-semibold text-slate-700'>Sort:</label>
                         <select onChange={handleChange}
-                            defaultValue={'createdAt_desc'} id="sort_order" className='bg-white border p-3 rounded-lg'>
-                            <option value="regularPrice_desc">Price hight to low</option>
-                            <option value="regularPrice_asc">Price low to hight </option>
+                            value={`${sidebardata.sort}_${sidebardata.order}`}
+                            id="sort_order" 
+                            className='bg-white border p-3 rounded-lg'
+                        >
+                            <option value="regularPrice_desc">Price high to low</option>
+                            <option value="regularPrice_asc">Price low to high</option>
                             <option value="createdAt_desc">Latest</option>
                             <option value="createdAt_asc">Oldest</option>
                         </select>
@@ -179,27 +190,31 @@ const Search = () => {
 
             {/* rightside */}
             <div className='flex-1'>
-                <h1 className='text-3xl font-semibold  p-3 text-slate-700 mt-5'>Listing Results:</h1>
+                <h1 className='text-3xl font-semibold p-3 text-slate-700 mt-5'>Listing Results:</h1>
                 <div className='p-7 flex flex-wrap gap-4'>
-                    {
-                        !loading && listing.length===0 &&(
-                            <p className='text-xl text-slate-700 text-center '>No listing fould!</p>
-                        )
-                    }
-                    {
-                        loading&&(
-                            <p className='text-xl text-slate-700 text-center w-full'>Loading...</p>
-                        )
-                    }
-                    {
-                        !loading && listing && listing.map((listing)=>(
-                            <ListingItem key={listing._id} listing={listing} />
-                        ))
-                    }
+                    {!loading && listing.length === 0 && (
+                        <p className='text-xl text-slate-700 text-center '>No listing found!</p>
+                    )}
+                    {loading && (
+                        <p className='text-xl text-slate-700 text-center w-full'>Loading...</p>
+                    )}
+                    {!loading && listing.map((item) => (
+                        <ListingItem key={item._id} listing={item} />
+                    ))}
                 </div>
+                {showmore && (
+                    <div className='text-center p-4'>
+                        <button 
+                            onClick={onShowMoreClick}
+                            className='text-green-700 hover:underline p-2 text-lg font-medium'
+                        >
+                            Show More
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Search
+export default Search;

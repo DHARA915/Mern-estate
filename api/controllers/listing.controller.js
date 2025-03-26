@@ -83,14 +83,14 @@ export const getlistings =async(req,res,next)=>{
   const limit =parseInt (req.query.limit)||9
   const startIndex=parseInt(req.query.startIndex)||0
   let offer= req.query.offer;
-  if(offer===undefined||'false'){
-    offer={$in:[false,true ]}
-  }
-  // if (offer === undefined || offer === 'false') {
-  //   offer = { $in: [false, true] };
-  // } else if (offer === 'true') {
-  //   offer = true;
+  // if(offer===undefined||'false'){
+  //   offer={$in:[false,true ]}
   // }
+  if (offer === undefined || offer === 'false') {
+    offer = { $in: [false, true] };
+  } else if (offer === 'true') {
+    offer = true;
+  }
 
   let furnished=req.query.furnished;
   // if(furnished===undefined||'false'){

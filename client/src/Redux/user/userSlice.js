@@ -1,8 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
+const safeParse = (value) => {
+  try {
+    return value ? JSON.parse(value) : null;
+  } catch (error) {
+    console.error("Error parsing JSON:", error);
+    return null;
+  }
+};
 
 const initialState = {
-  currentUser: JSON.parse(localStorage.getItem("user")) || null,
-  error: null,
+  currentUser: safeParse(localStorage.getItem("user")),  // ✅ Prevents JSON errors
   loading: false,
 };
 

@@ -206,7 +206,7 @@ const Search = () => {
                     <div className='text-center p-4'>
                         <button 
                             onClick={onShowMoreClick}
-                            className='text-green-700 hover:underline p-2 text-lg font-medium'
+                            className='text-slate-700 hover:underline p-2 text-lg font-medium'
                         >
                             Show More
                         </button>

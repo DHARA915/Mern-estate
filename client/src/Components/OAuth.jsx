@@ -1,5 +1,7 @@
 import React from 'react'
 import {getAuth, GoogleAuthProvider, signInWithPopup} from 'firebase/auth'
+import { motion, AnimatePresence } from 'framer-motion';
+import { FcGoogle } from 'react-icons/fc'
 import { app } from '../firebase'
 import {useDispatch} from 'react-redux'
 import {signInSuccess} from '../Redux/user/userSlice.js'
@@ -37,8 +39,19 @@ const dispatch =useDispatch()
  }
 
   return (
-    <button onClick={handleGoogleClick} type='button' className='bg-red-700 text-white p-3 rounded-lg uppercase hover:opacity-85'>Continue With google</button>
-  )
+<motion.button
+                  type="button"
+                  onClick={handleGoogleClick}
+                  className="w-full bg-white text-gray-700 py-3 rounded-lg font-medium border border-gray-300 hover:bg-gray-50 transition-all shadow-sm flex items-center justify-center gap-3"
+                  whileHover={{ 
+                    y: -2,
+                    boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                 <FcGoogle/>
+                  Continue with Google
+                </motion.button>  )
 }
 
 export default OAuth

@@ -85,7 +85,7 @@ const Listingpage = () => {
     }
 
     return (
-        <main className="min-h-screen bg-gradient-to-b from-gray-50 to-indigo-50">
+        <main className="min-h-screen bg-[rgb(241,245 , 241)]">
             {loading && (
                 <motion.div 
                     className="text-center my-7 text-2xl"

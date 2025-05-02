@@ -311,7 +311,7 @@ const ShowListing = () => {
                     <div className="flex justify-between items-start mb-3">
                       <h3 className="text-xl font-bold text-slate-800">{listing.name}</h3>
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-slate-100 text-slate-800">
-                        ₹{formatPrice(listing.discountPrice || listing.regularPrice)}
+                        ${formatPrice(listing.discountPrice || listing.regularPrice)}
                         {listing.type === 'rent' && '/mo'}
                       </span>
                     </div>

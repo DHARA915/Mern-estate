@@ -14,7 +14,7 @@ export const protect = (req, res, next) => {
     token = req.cookies.access_token;
   }
 
-  console.log("🛠 Token received:", token); // Debugging log
+  // console.log("🛠 Token received:", token); // Debugging log
 
   if (!token) {
     return next(errorHandler(401, "Not authorized, no token provided"));

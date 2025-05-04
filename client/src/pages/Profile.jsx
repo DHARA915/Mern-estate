@@ -147,7 +147,7 @@ const Profile = () => {
 
   const updateProfile = async (userData) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/user/update/${currentUser._id}`, {
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

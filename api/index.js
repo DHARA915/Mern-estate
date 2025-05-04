@@ -8,6 +8,7 @@ import test from './routes/user.route.js'
 import cookieParser from 'cookie-parser';
 import cors from "cors";
 import axios from 'axios'
+import path from 'path'
 
 dotenv.config();
 
@@ -31,6 +32,9 @@ mongoose.connect(process.env.MONGO).then(()=>{
     console.log(err)
 })
 
+const __dirname = path.resolve();
+
+
 
 
 app.listen(3000,()=>{
@@ -44,6 +48,12 @@ app.listen(3000,()=>{
 app.use('/api/auth',authRouter)
 app.use('/api/user',userRouter)
 app.use('/api/listing',listRouter)
+
+app.use(express.static(path.join(__dirname, '/client/dist')));
+
+app.get('*',(req,res)=>{
+   res.sendFile(path.join(__dirname,'client','dist','index.html'));
+})
 
 
 

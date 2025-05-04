@@ -23,7 +23,7 @@ app.use(cookieParser());
 //     credentials: true,
     
 // }));
-const cors = require("cors");
+
 
 app.use(cors({
   origin: ["http://localhost:5173", "https://eternahomes.onrender.com"], // add all allowed origins
